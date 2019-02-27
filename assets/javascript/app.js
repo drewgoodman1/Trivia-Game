@@ -1,9 +1,19 @@
 $(document).ready(function() {
 
     
-    var timeLeft = 25;
+    var timeLeft = 10;
+    //var quickTime = 3;
     var questionNumber = 0;
+    var checkAnswer;
+    var numberRight = 0;
+    var numberWrong = 0;
+
+    //main timer
     var runningTimer;
+    
+    //timer to show answer before moving on
+    var quickTimer;
+    
 
     var triviaQ = [
         {
@@ -38,7 +48,7 @@ $(document).ready(function() {
         $("#startButton").hide();
         timeLeft--;
         
-        if(timeLeft > 0){
+        if(timeLeft >= 0){
         //console.log("from show time");
             $("#timer").html("Time left: " + timeLeft);
             runningTimer = setTimeout(keepTime, 1000);
@@ -46,7 +56,7 @@ $(document).ready(function() {
         }
         else{
             questionNumber++;
-            timeLeft = 25;
+            timeLeft = 10;
             $("#question").empty();
             $("#choices").empty();
             
@@ -56,7 +66,9 @@ $(document).ready(function() {
         }
     }
 
-    function loadQuestion(){          
+    function loadQuestion(){  
+          //keepTime(); 
+          clearInterval(quickTimer);     
           var rightAnswer = triviaQ[questionNumber].correct;
           
           var questionDiv = $("<ul>")
@@ -73,25 +85,51 @@ $(document).ready(function() {
                     console.log();
                     if($(this).val() === rightAnswer){
                         console.log("yes!!");
-                        nextQuestion();
+                        numberRight++;
+                        checkAnswer = "You got this one right! ";
+                        clearTimeout(runningTimer);
+                        display();
+                        quickTimer = setInterval(nextQuestion, 3000);
+                        
+                        //nextQuestion();
                         
                     }else{
                         console.log("no!");
-                        nextQuestion();
+                        numberWrong++;
+                        checkAnswer = "You got this one wrong - the correct answer was ";
+                        display();
+                        clearTimeout(runningTimer);
+                        display();
+                        quickTimer = setInterval(nextQuestion, 3000);
+                        //nextQuestion();
                     }                 
                 });              
               questionDiv.append(newAnswer);                
-            }            
+        }            
     }
 
     function nextQuestion(){
-        timeLeft = 25;
-        clearInterval(runningTimer);
+        timeLeft = 10;
+        //setTimeout(keepTime,1000);
+        //clearInterval(quickTimer);
+        $("#update").empty();
         $("#question").empty();
         $("#choices").empty();
         questionNumber++;
-        /*loadQuestion();
-        keepTime();*/        
+        //setInterval(runningTimer);
+        keepTime();
+        loadQuestion();
+               
+    }
+
+    function display(){
+            $("#update").html(checkAnswer + "So far " + numberRight + " correct, and " + numberWrong + " incorrect");                   
+    }
+
+    function emptyDiv(){
+        $("#update").empty();
+        $("#question").empty();
+        $("#choices").empty();
     }
 
 });
